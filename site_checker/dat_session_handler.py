@@ -5,6 +5,7 @@ import csv
 import datetime
 
 _default_cookies_path = 'cookies.csv'
+_default_headers_path = 'headers.txt'
 _sample_html_path = os.path.join('tests', 'sample_html.html')
 
 
@@ -18,10 +19,20 @@ class DATSession(requests.Session):
     _project_url: Optional[str] = None
     _project_url_file = 'project_url.txt'
 
-    def __init__(self, cookies_path:str=_default_cookies_path):
+    def __init__(self, cookies_path:str=_default_cookies_path, headers_path:str=_default_headers_path):
         super().__init__()
+        self.headers_path = headers_path
         self.cookies_path = cookies_path
+        self.load_headers()
         self.load_cookies()
+
+    def load_headers(self):
+        with open(self.headers_path, 'r') as fr:
+            for line in fr:
+                if ': ' not in line:
+                    continue
+                k, v = line.strip().split(': ')
+                self.headers[k] = v
 
     def load_cookies(self):
         with open(self.cookies_path, 'r') as file:

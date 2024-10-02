@@ -1,3 +1,5 @@
+import os
+import subprocess
 import sys
 from typing import List
 
@@ -32,7 +34,7 @@ class ProjectWindow(QWidget):
         layout = QVBoxLayout()
         for project in self.projects:
             project_layout = QVBoxLayout()
-            title_label = QLabel(f'{project.title} (${project.rate_per_hour}/hr, {project.available_tasks} tasks left)')
+            title_label = QLabel(f'${project.rate_per_hour}/hr {project.title} ({project.available_tasks} tasks left)')
             project_layout.addWidget(title_label)
             btn_layout = QHBoxLayout()
             for label, func in [('Copy URL', self.copy_url), ('Open', self.open_project), ('Copy Title', self.copy_title)]:
@@ -50,18 +52,23 @@ class ProjectWindow(QWidget):
         QApplication.clipboard().setText(url)
 
     def open_project(self, url):
-        print(f'Open project at {url}')
+        command = [
+            "firefox-bin",
+            "--profile", os.environ.get('FIREFOX_PROFILE_PATH', ''),
+            url,
+        ]
+        subprocess.Popen(command)
 
     def copy_title(self, title):
         QApplication.clipboard().setText(title)
 
     def delayed_wrapper(self, button, func, project:Project):
         if self.timer.elapsed() > 2000:
-            if func is self.copy_url:
+            if func == self.copy_url:
                 func(project.url)
-            elif func is self.open_project:
+            elif func == self.open_project:
                 func(project.url)
-            elif func is self.copy_title:
+            elif func == self.copy_title:
                 func(project.title)
 
 

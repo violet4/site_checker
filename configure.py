@@ -1,7 +1,10 @@
 import csv
 import os
 
-from site_checker.dat_session_handler import DATSession, _default_cookies_path, _sample_html_path
+from site_checker.dat_session_handler import (
+    DATSession, _default_cookies_path, _sample_html_path,
+    _default_headers_path,
+)
 from site_checker.project import _url_base_filename
 
 
@@ -24,6 +27,10 @@ def main():
             csvw.writerows(headers)
             # empty row shows csv structure
             csvw.writerow(['']*len(headers))
+    if not os.path.exists(_default_headers_path):
+        with open(_default_headers_path, 'w') as fw:
+            pass
+        print(f"Please copy-paste headers from a sample call from your web browser into file {_default_headers_path}")
     if not os.path.exists(_sample_html_path):
         with open(_sample_html_path, 'w') as fw:
             print(file=fw)
